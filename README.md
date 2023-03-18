@@ -29,3 +29,6 @@ La arquitectura implementa en el proyecto esta basada en la libreria [flutter_cl
 ## Patron: 
 - bloc
 
+https://raw.githubusercontent.com/SebastianAvendano/moviesFlutter/main//assets/img_1.jpeg
+https://raw.githubusercontent.com/SebastianAvendano/moviesFlutter/main//assets/img_2.jpeg
+https://raw.githubusercontent.com/SebastianAvendano/moviesFlutter/main//assets/img_3.jpeg

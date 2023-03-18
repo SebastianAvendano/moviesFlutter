@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:movies/ui/blocs/bottom_navigation/bottom_navigation_bloc.dart';
+import 'package:movies/ui/blocs/favorites/favorites_bloc.dart';
+import 'package:movies/ui/views/main_view/main_view.dart';
+import 'ui/blocs/movie_detail/detail_bloc.dart';
 
 // Theme project
-import 'presentation/theme/app_theme.dart';
+import 'ui/theme/app_theme.dart';
 
 //Config project
-import 'package:movies/dependency_injection/initial_config.dart';
+import 'package:movies/di/initial_config.dart';
 
 // Routes
-import 'package:movies/presentation/router.dart';
+import 'package:movies/ui/router.dart';
 
 
 void main() async {
@@ -21,12 +26,25 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      theme: AppTheme.lightTheme,
-      onGenerateRoute: RouterGenerator.generateRoute,
-      initialRoute: '/',
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => BottomNavigationBloc(),
+        ),
+         BlocProvider<DetailBloc>(
+          create: (context) => DetailBloc(),
+        ),
+        BlocProvider<FavoritesBloc>(
+          create: (context) => FavoritesBloc(),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        title: 'Movies app',
+        theme: AppTheme.darkTheme,
+        onGenerateRoute: RouterGenerator.generateRoute,
+        home: const MainView(),
+      ),
     );
   }
 }

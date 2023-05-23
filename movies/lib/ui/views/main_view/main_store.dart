@@ -14,7 +14,7 @@ class MainStore {
     BottomBarModel(
       icon: Icons.search,
       label: 'Buscar',
-      widget: SearchView(), 
+      widget: SearchView(),
     ),
     BottomBarModel(
       icon: Icons.favorite,

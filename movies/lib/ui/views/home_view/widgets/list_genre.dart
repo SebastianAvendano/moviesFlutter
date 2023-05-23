@@ -2,18 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:movies/data/models/genre_response/genre_response.dart';
-import 'package:movies/ui/blocs/genre/genre_bloc.dart';
-import 'package:movies/ui/blocs/genre/genre_event.dart';
-import 'package:movies/ui/blocs/genre/genre_state.dart';
-import 'package:movies/ui/blocs/movie/movie_bloc.dart';
-import 'package:movies/ui/blocs/movie/movie_event.dart';
+import 'package:movies/domain/blocs/genre/genre_bloc.dart';
+import 'package:movies/ui/views/home_view/home_controller.dart';
 import 'package:movies/ui/views/home_view/widgets/genre_option.dart';
 import 'package:movies/ui/views/home_view/widgets/list_movies.dart';
 import 'package:movies/ui/widgets/activity_indicator.dart';
 
 final injector = GetIt.instance;
-final genreController = injector.get<GenreBloc>();
-final movieController = injector.get<MovieBloc>();
+final controller = injector.get<HomeController>();
 
 class ListGenres extends StatefulWidget {
   final int selectedGenre;
@@ -35,15 +31,7 @@ class _ListGenresState extends State<ListGenres> {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<GenreBloc>(
-          create: (_) => genreController..add(const GenreEventStarted()),
-        ),
-        BlocProvider<MovieBloc>(
-          create: (_) => movieController..add(MovieEventStarted(selectedGenre, '')),
-        ),
-      ],
+    return Expanded(
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,10 +47,10 @@ class _ListGenresState extends State<ListGenres> {
   BlocBuilder<GenreBloc, GenreState> _buildOptions() {
     return BlocBuilder<GenreBloc, GenreState>(
       builder: (context, state) {
-        if (state is GenreLoading) {
+        if (state.isLoading) {
           const ActivityIndicator();
-        } else if (state is GenreLoaded) {
-          List<Genre> genres = state.genreList;
+        } else if (state.genres.isNotEmpty) {
+          List<Genre> genres = state.genres;
           return SizedBox(
             height: 45,
             child: ListView.separated(
@@ -80,9 +68,10 @@ class _ListGenresState extends State<ListGenres> {
                       setState(() {
                         Genre genre = genres[index];
                         selectedGenre = genre.id!;
-                        context
-                            .read<MovieBloc>()
-                            .add(MovieEventStarted(selectedGenre, ''));
+                        controller.onChangeGenre(
+                          context: context,
+                          idGenre: genre.id!,
+                        );
                       });
                     },
                     child: GenreOption(

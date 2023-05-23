@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:movies/data/models/movie/movie_model.dart';
-import 'package:movies/ui/blocs/movie/movie_bloc.dart';
-import 'package:movies/ui/blocs/movie/movie_event.dart';
-import 'package:movies/ui/blocs/movie/movie_state.dart';
+import 'package:movies/domain/blocs/movie/movie_bloc.dart';
+import 'package:movies/domain/blocs/profile/profile_bloc.dart';
+import 'package:movies/ui/views/home_view/home_controller.dart';
 import 'package:movies/ui/widgets/activity_indicator.dart';
 import 'package:movies/ui/widgets/app_bar.dart';
 
@@ -12,67 +11,80 @@ import 'widgets/list_genre.dart';
 import 'widgets/movie_slider.dart';
 
 final injector = GetIt.instance;
-final controller = injector.get<MovieBloc>();
 
-class HomeView extends StatelessWidget {
+class HomeView extends StatefulWidget {
   const HomeView({super.key});
 
   @override
+  State<HomeView> createState() => _HomeViewState();
+}
+
+class _HomeViewState extends State<HomeView> {
+  final homeController = injector.get<HomeController>();
+  @override
+  void initState() {
+    homeController.init(context);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    homeController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<MovieBloc>(
-          create: (_) => controller..add(const MovieEventStarted(0, '')),
-        ),
-      ],
-      child: Scaffold(
-          appBar: const CustomAppBar(
+    final user = ProfileActions.getCurrentState(context: context).user;
+    return Scaffold(
+      appBar: CustomAppBar(
         title: Text(
-          "Movies",
-          style: TextStyle(
+          user.displayName!.isNotEmpty
+              ? "${user.displayName!.split(' ')[0]} ${user.displayName!.split(' ')[1]}"
+              : "movies",
+          style: const TextStyle(
             fontWeight: FontWeight.w600,
-            fontSize: 26,
+            fontSize: 16,
           ),
         ),
         actions: [
           Padding(
-            padding: EdgeInsets.only(right: 15),
-            child: Icon(Icons.account_circle),
+            padding: const EdgeInsets.only(right: 15),
+            child: IconButton(
+              onPressed: () => homeController.logOut(context),
+              icon: const Icon(Icons.account_circle),
+            ),
           ),
         ],
       ),
-        body: LayoutBuilder(
-          builder: (BuildContext context, BoxConstraints constraints) {
-            return ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _builCarousel(),
-                  const SizedBox(height: 15,),
-                  const ListGenres(),
-                ],
-              ),
-            );
-          },
-        ),
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          _builCarousel(),
+          const SizedBox(
+            height: 15,
+          ),
+          const ListGenres(),
+        ],
       ),
     );
   }
 
-  BlocBuilder<MovieBloc, MovieState> _builCarousel() {
-    return BlocBuilder<MovieBloc, MovieState>(
-      builder: (context, state) {
-        if (state is MovieLoading) {
-          return const Center(
-            child: ActivityIndicator(),
-          );
-        } else if (state is MovieLoaded) {
-          List<MovieModel> movies = state.movieList;
+  Widget _builCarousel() {
+    return ValueListenableBuilder(
+      valueListenable: homeController.isLoading,
+      builder: (BuildContext _, bool isLoading, Widget? child) => child!,
+      child: BlocBuilder<MovieBloc, MovieState>(
+        builder: (context, state) {
+          if (state.isLoading) {
+            return const Center(
+              child: ActivityIndicator(),
+            );
+          }
+          final movies = state.movies;
           return MovieSlider(movies: movies);
-        }
-        return Container();
-      },
+        },
+      ),
     );
   }
 }

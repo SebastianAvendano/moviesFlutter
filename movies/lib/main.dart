@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:movies/ui/blocs/bottom_navigation/bottom_navigation_bloc.dart';
-import 'package:movies/ui/blocs/favorites/favorites_bloc.dart';
+import 'package:movies/domain/blocs/bottom_navigation/bottom_navigation_bloc.dart';
+import 'package:movies/domain/blocs/genre/genre_bloc.dart';
+import 'package:movies/domain/blocs/movie/movie_bloc.dart';
+import 'package:movies/domain/blocs/profile/profile_bloc.dart';
 import 'package:movies/ui/views/main_view/main_view.dart';
-import 'ui/blocs/movie_detail/detail_bloc.dart';
 
 // Theme project
 import 'ui/theme/app_theme.dart';
@@ -13,7 +14,6 @@ import 'package:movies/di/initial_config.dart';
 
 // Routes
 import 'package:movies/ui/router.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -31,11 +31,14 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => BottomNavigationBloc(),
         ),
-         BlocProvider<DetailBloc>(
-          create: (context) => DetailBloc(),
+        BlocProvider<MovieBloc>(
+          create: (context) => MovieBloc(),
         ),
-        BlocProvider<FavoritesBloc>(
-          create: (context) => FavoritesBloc(),
+        BlocProvider<GenreBloc>(
+          create: (context) => GenreBloc(),
+        ),
+        BlocProvider<ProfileBloc>(
+          create: (context) => ProfileBloc(),
         ),
       ],
       child: MaterialApp(

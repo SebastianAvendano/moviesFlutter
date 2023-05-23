@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:movies/ui/views/search_view/widgets/search_delegate.dart';
 import 'package:movies/ui/widgets/app_bar.dart';
 
+
 class SearchView extends StatelessWidget {
   const SearchView({super.key});
 

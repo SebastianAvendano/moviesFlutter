@@ -2,7 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:movies/data/models/movie/movie_model.dart';
-import 'package:movies/ui/blocs/movie_detail/detail_bloc.dart';
+import 'package:movies/domain/blocs/movie/movie_bloc.dart';
 import 'package:movies/ui/widgets/activity_indicator.dart';
 
 class MoviePoster extends StatelessWidget {
@@ -12,10 +12,10 @@ class MoviePoster extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-       onTap: () {
-          context.read<DetailBloc>().add(DetailEventStarted(movie));
-          Navigator.pushNamed(context, '/details');
-        },
+      onTap: () {
+        context.read<MovieBloc>().add(MovieEventSetMovieSelected(movie));
+        Navigator.pushNamed(context, '/details');
+      },
       child: ClipRRect(
         borderRadius: const BorderRadius.all(Radius.circular(10)),
         child: CachedNetworkImage(

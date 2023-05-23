@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
-import 'package:movies/ui/blocs/search/search_bloc.dart';
+import 'package:movies/domain/blocs/movie/movie_bloc.dart';
+import 'package:movies/ui/views/search_view/search_controller.dart';
 import 'package:movies/ui/widgets/activity_indicator.dart';
 import 'package:movies/ui/widgets/grid_list_movies.dart';
 
 final injector = GetIt.instance;
-final controller = injector.get<SearchBloc>();
+final controller = injector.get<SearchController>();
 
 class MovieSearchDelegate extends SearchDelegate {
   @override
@@ -30,7 +31,6 @@ class MovieSearchDelegate extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    // TODO: implement buildResults
     return const Text('data');
   }
 
@@ -49,24 +49,16 @@ class MovieSearchDelegate extends SearchDelegate {
     if (query.isEmpty) {
       return _empyContainer();
     }
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<SearchBloc>(
-          create: (_) => controller..add(SearchEventStarted(query)),
-        ),
-      ],
-      child: BlocBuilder<SearchBloc, SearchState>(
-        builder: (context, state) {
-          if (state is SearchLoading) {
-            return const Center(
-              child: ActivityIndicator(),
-            );
-          } else if (state is SearchLoaded) {
-            return GridListMovies(movies: state.movieList, size: double.infinity,);
-          }
-          return Container();
-        },
-      ),
+    controller.searchMovies(context: context, query: query);
+    return BlocBuilder<MovieBloc, MovieState>(
+      builder: (context, state) {
+        if (state.isLoading) {
+          return const Center(
+            child: ActivityIndicator(),
+          );
+        }
+        return GridListMovies(movies: state.movies);
+      },
     );
   }
 }

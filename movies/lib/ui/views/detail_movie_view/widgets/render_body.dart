@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:jiffy/jiffy.dart';
 import 'package:movies/data/models/movie/movie_model.dart';
 import 'package:movies/ui/theme/colors_theme.dart';
 
@@ -19,19 +20,32 @@ class RenderBody extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _renderScore(),
-                const SizedBox(height: 15),
+                _space(),
                 Text(
                   movie.title!,
-                  style: textTheme.headline5,
+                  style: textTheme.headlineSmall,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                 ),
-                const SizedBox(height: 15),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "Fecha de estreno ${Jiffy.parseFromDateTime(movie.releaseDate!).format(pattern: 'dd/MM/yyyy')}",
+                    ),
+                    _renderScore(),
+                  ],
+                ),
+                _space(),
+                Text(
+                  "Sinopsis",
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                const SizedBox(height: 10),
                 Text(
                   movie.overview!,
                   textAlign: TextAlign.justify,
-                  style: Theme.of(context).textTheme.subtitle1,
+                  style: Theme.of(context).textTheme.titleMedium,
                 ),
               ],
             ),
@@ -40,6 +54,8 @@ class RenderBody extends StatelessWidget {
       ),
     );
   }
+
+  SizedBox _space() => const SizedBox(height: 20);
 
   Row _renderScore() {
     return Row(
